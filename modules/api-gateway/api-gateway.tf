@@ -47,15 +47,8 @@ resource "aws_api_gateway_integration_response" "webhook_shopify_post_integratio
   status_code = "${aws_api_gateway_method_response.webhook_shopify_post_method_response_200.status_code}"
 }
 
-resource "aws_api_gateway_stage" "myapp_deployment_stage" {
-  stage_name = "dev-temp"
-  rest_api_id = "${aws_api_gateway_rest_api.myapp_apig.id}"
-  deployment_id = "${aws_api_gateway_deployment.myapp_deployment.id}"
-}
-
 resource "aws_api_gateway_deployment" "myapp_deployment" {
   rest_api_id = "${aws_api_gateway_rest_api.myapp_apig.id}"
   stage_name = "dev"
   depends_on = ["aws_api_gateway_integration.webhook_shopify_post_integration"]
 }
-
