@@ -1,0 +1,11 @@
+version: "3.7"
+
+services:
+  terraform:
+    image: hashicorp/terraform
+    container_name: api-gateway-terraform
+    env_file: ./.env
+    entrypoint: ""
+    working_dir: /app
+    volumes:
+      - $PWD:/app

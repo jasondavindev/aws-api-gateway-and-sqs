@@ -1,0 +1,4 @@
+credentials.csv
+.env
+.terraform
+*.tfstate*

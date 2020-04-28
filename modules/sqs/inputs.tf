@@ -1,0 +1,1 @@
+variable "queue_name" {}
