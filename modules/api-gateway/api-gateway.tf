@@ -54,8 +54,8 @@ resource "aws_api_gateway_integration_response" "messages_post_integration_respo
 
 resource "aws_api_gateway_deployment" "api_deployment" {
   rest_api_id = "${aws_api_gateway_rest_api.example_api.id}"
-  stage_name = "dev"
-  depends_on = [
+  stage_name  = "dev"
+  depends_on  = [
     "aws_api_gateway_integration.messages_post_integration",
     "aws_api_gateway_integration_response.messages_post_integration_response_200"
   ]

@@ -47,7 +47,7 @@ EOF
 }
 
 resource "aws_iam_policy_attachment" "apig_sqs_policy_attach" {
-  name = "${var.app_name}-iam-policy-attach"
-  roles = ["${aws_iam_role.apig-sqs-send-msg-role.id}"]
+  name       = "${var.app_name}-iam-policy-attach"
+  roles      = ["${aws_iam_role.apig-sqs-send-msg-role.id}"]
   policy_arn = "${aws_iam_policy.apig-sqs-send-msg-policy.arn}"
 }
