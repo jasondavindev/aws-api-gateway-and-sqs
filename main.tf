@@ -30,3 +30,9 @@ module "policies" {
   queue_arn = "${module.sqs.queue_arn}"
   app_name  = "${local.app_name}"
 }
+
+module "cors" {
+  source = "./modules/cors"
+  api_id = "${module.api_gateway.api_id}"
+  api_resource_id = "${module.api_gateway.api_resource_id}"
+}

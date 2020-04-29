@@ -60,3 +60,23 @@ resource "aws_api_gateway_deployment" "api_deployment" {
     "aws_api_gateway_integration_response.messages_post_integration_response_200"
   ]
 }
+
+resource "aws_api_gateway_usage_plan" "api_usage_plan" {
+  name         = "${var.app_name}-usage-plan"
+
+  api_stages {
+    api_id = "${aws_api_gateway_rest_api.example_api.id}"
+    stage  = "${aws_api_gateway_deployment.api_deployment.stage_name}"
+  }
+
+  quota_settings {
+    limit  = 20
+    offset = 2
+    period = "WEEK"
+  }
+
+  throttle_settings {
+    burst_limit = 5
+    rate_limit  = 10
+  }
+}
