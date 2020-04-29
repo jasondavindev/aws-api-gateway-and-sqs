@@ -1,16 +1,16 @@
-resource "aws_api_gateway_rest_api" "myapp_apig" {
+resource "aws_api_gateway_rest_api" "example_api" {
   name = "${var.api_name}"
 }
 
-resource "aws_api_gateway_resource" "webhook_shopify_resource" {
-  path_part   = "shopify"
-  parent_id   = "${aws_api_gateway_rest_api.myapp_apig.root_resource_id}"
-  rest_api_id = "${aws_api_gateway_rest_api.myapp_apig.id}"
+resource "aws_api_gateway_resource" "message_resource" {
+  path_part   = "messages"
+  parent_id   = "${aws_api_gateway_rest_api.example_api.root_resource_id}"
+  rest_api_id = "${aws_api_gateway_rest_api.example_api.id}"
 }
 
-resource "aws_api_gateway_method" "webhook_shopify_post_method" {
-  rest_api_id   = "${aws_api_gateway_rest_api.myapp_apig.id}"
-  resource_id   = "${aws_api_gateway_resource.webhook_shopify_resource.id}"
+resource "aws_api_gateway_method" "messages_post_method" {
+  rest_api_id   = "${aws_api_gateway_rest_api.example_api.id}"
+  resource_id   = "${aws_api_gateway_resource.message_resource.id}"
   http_method   = "POST"
   authorization = "NONE"
   request_parameters = {
@@ -18,10 +18,10 @@ resource "aws_api_gateway_method" "webhook_shopify_post_method" {
   }
 }
 
-resource "aws_api_gateway_integration" "webhook_shopify_post_integration" {
-  rest_api_id             = "${aws_api_gateway_rest_api.myapp_apig.id}"
-  resource_id             = "${aws_api_gateway_resource.webhook_shopify_resource.id}"
-  http_method             = "${aws_api_gateway_method.webhook_shopify_post_method.http_method}"
+resource "aws_api_gateway_integration" "messages_post_integration" {
+  rest_api_id             = "${aws_api_gateway_rest_api.example_api.id}"
+  resource_id             = "${aws_api_gateway_resource.message_resource.id}"
+  http_method             = "${aws_api_gateway_method.messages_post_method.http_method}"
   integration_http_method = "POST"
   type                    = "AWS"
   credentials             = "${var.iam_role_arn}"
@@ -33,22 +33,30 @@ resource "aws_api_gateway_integration" "webhook_shopify_post_integration" {
   }
 }
 
-resource "aws_api_gateway_method_response" "webhook_shopify_post_method_response_200" {
-  rest_api_id = "${aws_api_gateway_rest_api.myapp_apig.id}"
-  resource_id = "${aws_api_gateway_resource.webhook_shopify_resource.id}"
-  http_method = "${aws_api_gateway_method.webhook_shopify_post_method.http_method}"
+resource "aws_api_gateway_method_response" "messages_post_method_response_200" {
+  rest_api_id = "${aws_api_gateway_rest_api.example_api.id}"
+  resource_id = "${aws_api_gateway_resource.message_resource.id}"
+  http_method = "${aws_api_gateway_method.messages_post_method.http_method}"
   status_code = "200"
 }
 
-resource "aws_api_gateway_integration_response" "webhook_shopify_post_integration_response_200" {
-  rest_api_id = "${aws_api_gateway_rest_api.myapp_apig.id}"
-  resource_id = "${aws_api_gateway_resource.webhook_shopify_resource.id}"
-  http_method = "${aws_api_gateway_method.webhook_shopify_post_method.http_method}"
-  status_code = "${aws_api_gateway_method_response.webhook_shopify_post_method_response_200.status_code}"
+resource "aws_api_gateway_integration_response" "messages_post_integration_response_200" {
+  rest_api_id = "${aws_api_gateway_rest_api.example_api.id}"
+  resource_id = "${aws_api_gateway_resource.message_resource.id}"
+  http_method = "${aws_api_gateway_method.messages_post_method.http_method}"
+  status_code = "${aws_api_gateway_method_response.messages_post_method_response_200.status_code}"
+  depends_on  = [
+    "aws_api_gateway_resource.message_resource",
+    "aws_api_gateway_method.messages_post_method",
+    "aws_api_gateway_method_response.messages_post_method_response_200"
+  ]
 }
 
-resource "aws_api_gateway_deployment" "myapp_deployment" {
-  rest_api_id = "${aws_api_gateway_rest_api.myapp_apig.id}"
+resource "aws_api_gateway_deployment" "api_deployment" {
+  rest_api_id = "${aws_api_gateway_rest_api.example_api.id}"
   stage_name = "dev"
-  depends_on = ["aws_api_gateway_integration.webhook_shopify_post_integration"]
+  depends_on = [
+    "aws_api_gateway_integration.messages_post_integration",
+    "aws_api_gateway_integration_response.messages_post_integration_response_200"
+  ]
 }
