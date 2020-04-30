@@ -18,6 +18,8 @@ module "api_gateway" {
   iam_role_arn = "${module.policies.iam_role_arn}"
   region       = "${local.region}"
   queue_url    = "${module.sqs.queue_url}"
+  integration_response_parameters = "${module.cors.integration_response_parameters}"
+  method_response_parameters = "${module.cors.method_response_parameters}"
 }
 
 module "sqs" {

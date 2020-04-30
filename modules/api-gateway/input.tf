@@ -11,3 +11,7 @@ variable "account_id" {}
 variable "region" {}
 
 variable "queue_url" {}
+
+variable "integration_response_parameters" {}
+
+variable "method_response_parameters" {}

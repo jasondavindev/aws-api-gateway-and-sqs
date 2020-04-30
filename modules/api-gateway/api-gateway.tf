@@ -38,6 +38,7 @@ resource "aws_api_gateway_method_response" "messages_post_method_response_200" {
   resource_id = "${aws_api_gateway_resource.message_resource.id}"
   http_method = "${aws_api_gateway_method.messages_post_method.http_method}"
   status_code = "200"
+  response_parameters = "${var.method_response_parameters}"
 }
 
 resource "aws_api_gateway_integration_response" "messages_post_integration_response_200" {
@@ -45,6 +46,7 @@ resource "aws_api_gateway_integration_response" "messages_post_integration_respo
   resource_id = "${aws_api_gateway_resource.message_resource.id}"
   http_method = "${aws_api_gateway_method.messages_post_method.http_method}"
   status_code = "${aws_api_gateway_method_response.messages_post_method_response_200.status_code}"
+  response_parameters = "${var.integration_response_parameters}"
   depends_on  = [
     "aws_api_gateway_resource.message_resource",
     "aws_api_gateway_method.messages_post_method",
