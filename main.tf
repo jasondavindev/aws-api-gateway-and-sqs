@@ -1,6 +1,6 @@
 locals {
   region   = "sa-east-1"
-  app_name = "my_api_gtw"
+  app_name = "my-api-gtw"
 }
 
 data "aws_caller_identity" "current" {}
