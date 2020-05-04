@@ -13,9 +13,6 @@ resource "aws_api_gateway_method" "messages_post_method" {
   resource_id   = "${aws_api_gateway_resource.message_resource.id}"
   http_method   = "POST"
   authorization = "NONE"
-  request_parameters = {
-    "method.request.querystring.QueueUrl" = true
-  }
 }
 
 resource "aws_api_gateway_integration" "messages_post_integration" {
@@ -25,11 +22,38 @@ resource "aws_api_gateway_integration" "messages_post_integration" {
   integration_http_method = "POST"
   type                    = "AWS"
   credentials             = "${var.iam_role_arn}"
-  uri                     = "arn:aws:apigateway:${var.region}:sqs:action/SendMessage"
+  uri                     = "arn:aws:apigateway:${var.region}:sqs:path/${var.account_id}/${var.queue_name}"
 
   request_parameters = {
-    "integration.request.querystring.QueueUrl" = "'${var.queue_url}'"
-    "integration.request.querystring.MessageBody" = "method.request.body.body"
+    "integration.request.header.Content-Type" = "'application/x-www-form-urlencoded'"
+  }
+
+  request_templates = {
+    "application/json" = <<EOF
+Action=SendMessage&MessageBody={
+  "sourceIP": "$context.identity.sourceIp",
+  "body": $input.json('$'),
+  "headers": {
+    #foreach($header in $input.params().header.keySet())
+    "$header": "$util.escapeJavaScript($input.params().header.get($header))" #if($foreach.hasNext),#end
+
+    #end
+  },
+  "method": "$context.httpMethod",
+  "params": {
+    #foreach($param in $input.params().path.keySet())
+    "$param": "$util.escapeJavaScript($input.params().path.get($param))" #if($foreach.hasNext),#end
+
+    #end
+  },
+  "query": {
+    #foreach($queryParam in $input.params().querystring.keySet())
+    "$queryParam": "$util.escapeJavaScript($input.params().querystring.get($queryParam))" #if($foreach.hasNext),#end
+
+    #end
+  }
+}
+  EOF
   }
 }
 
